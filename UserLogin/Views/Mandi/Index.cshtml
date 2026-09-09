@@ -10,6 +10,25 @@
         <a href="/Mandi/Create" class="btn btn-success">+ नया स्टॉक जोड़ें</a>
     </div>
 
+    <!-- 🔍 लाइव सर्च और फ़िल्टर फॉर्म -->
+    <form method="get" action="/Mandi/Index" class="mb-4">
+        <div class="row g-2 justify-content-end">
+            <div class="col-md-4 col-8">
+                <!-- value में पुराना सर्च किया हुआ नाम बना रहेगा -->
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="सब्जी या फल का नाम टाइप करें..." />
+            </div>
+            <div class="col-md-2 col-4">
+                <button type="submit" class="btn btn-dark w-100 fw-bold">🔍 खोजें</button>
+            </div>
+            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+            {
+                <div class="col-md-1 col-12 text-center">
+                    <a href="/Mandi/Index" class="btn btn-outline-secondary w-100">साफ़ करें</a>
+                </div>
+            }
+        </div>
+    </form>
+
     <div class="card shadow-sm p-4">
         <table class="table table-bordered table-striped text-center align-middle">
             <thead class="table-dark">

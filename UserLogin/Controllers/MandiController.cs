@@ -41,16 +41,28 @@ namespace UserLogin.Controllers
             return View(item);
         }
         // 3. सारा मंडी स्टॉक स्क्रीन पर दिखाने के लिए (Read/Index)
+        // 📌 लाइव स्टॉक बोर्ड - सर्च बार के साथ (Read/Index)
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string searchString)
         {
-            // PostgreSQL डेटाबेस से सारा स्टॉक लिस्ट के रूप में ला रहे हैं
-            var stockList = _context.MandiItems.ToList();
+            // 1. डेटाबेस से सारे आइटम्स की क्वेरी तैयार करें (अभी रन नहीं होगी)
+            var itemsQuery = from m in _context.MandiItems
+                             select m;
 
-            // इस लिस्ट को व्यू (HTML) की तरफ भेज रहे हैं
-            return View(stockList);
+            // 2. यदि यूजर ने सर्च बॉक्स में कुछ टाइप किया है (Null या खाली नहीं है)
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                // LINQ का उपयोग करके नाम मैच करें (PostgreSQL में Contains केस-सेंसिटिव हो सकता है, इसलिए Lower कर सकते हैं)
+                itemsQuery = itemsQuery.Where(s => s.ItemName.ToLower().Contains(searchString.ToLower()));
+            }
+
+            // 3. सर्च की हुई स्ट्रिंग को वापस व्यू पर भेजें ताकि सर्च बॉक्स में वो नाम लिखा रहे
+            ViewData["CurrentFilter"] = searchString;
+
+            // 4. अंत में डेटाबेस से लिस्ट बनाकर व्यू (HTML) की तरफ भेजें
+            return View(itemsQuery.ToList());
         }
-        // 1. एडिट पेज दिखाने के लिए - पुराना डेटा लोड करना (GET)
+
         [HttpGet]
         public IActionResult Edit(int id)
         {
