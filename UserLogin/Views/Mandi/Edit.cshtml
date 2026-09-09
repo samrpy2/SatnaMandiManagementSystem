@@ -1,0 +1,40 @@
+﻿@model UserLogin.Models.MandiItem
+
+@{
+    ViewData["Title"] = "स्टॉक में संशोधन करें";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5 card p-4 shadow-sm">
+        <h3 class="text-center mb-4 text-warning">✏️ स्टॉक डेटा में सुधार करें</h3>
+
+        <form method="post" action="/Mandi/Edit">
+            <!-- 📌 1. यह छुपी हुई आईडी (Hidden Id) है जो बैकएंड को बताती है कि किस आइटम को बदलना है -->
+            <input type="hidden" name="Id" value="@Model.Id" />
+
+            <!-- 📌 2. आइटम का नाम (Hidden या Disabled भी रख सकते हैं, पर नाम मैच होना चाहिए) -->
+            <div class="mb-3">
+                <label class="form-label">फल या सब्जी का नाम</label>
+                <input type="text" name="ItemName" value="@Model.ItemName" class="form-control" required />
+            </div>
+
+            <!-- 📌 3. मात्रा (Quantity) - यह इनपुट बॉक्स होना बहुत ज़रूरी है वरना यह 0 हो जाएगा -->
+            <div class="mb-3">
+                <label class="form-label">मात्रा (क्विंटल में)</label>
+                <input type="number" step="0.01" name="QuantityInQuintal" value="@Model.QuantityInQuintal" class="form-control" required />
+            </div>
+
+            <!-- 📌 4. आज का भाव (Rate) - यह भी होना ज़रूरी है -->
+            <div class="mb-3">
+                <label class="form-label">आज का भाव (₹ प्रति क्विंटल)</label>
+                <input type="number" step="0.01" name="TodayRatePerQuintal" value="@Model.TodayRatePerQuintal" class="form-control" required />
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 fw-bold">बदलाव सुरक्षित करें</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/Mandi/Index" class="btn btn-link">← स्टॉक बोर्ड पर वापस जाएं</a>
+        </div>
+    </div>
+</div>

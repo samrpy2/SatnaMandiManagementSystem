@@ -1,0 +1,65 @@
+﻿@model IEnumerable<UserLogin.Models.MandiItem>
+
+@{
+    ViewData["Title"] = "सतना मंडी लाइव स्टॉक";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-success">🍏 सतना मंडी - लाइव स्टॉक बोर्ड</h2>
+        <a href="/Mandi/Create" class="btn btn-success">+ नया स्टॉक जोड़ें</a>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>आईडी</th>
+                    <th>आइटम का नाम</th>
+                    <th>मात्रा (क्विंटल)</th>
+                    <th>आज का भाव (₹/क्विंटल)</th>
+                    <th>कुल अनुमानित मूल्य (₹)</th>
+                    <th>आखिरी अपडेट</th>
+                    <th>एक्शन (Actions)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-muted">मंडी में अभी कोई स्टॉक उपलब्ध नहीं है।</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td class="fw-bold text-dark">@item.ItemName</td>
+                            <td>@item.QuantityInQuintal Qtl</td>
+                            <td class="text-success fw-bold">₹@item.TodayRatePerQuintal</td>
+                            <td class="text-primary fw-bold">
+                                🌐 ₹@(item.QuantityInQuintal* item.TodayRatePerQuintal)
+                            </td>
+                            <td class="text-muted small">@item.LastUpdated.ToLocalTime().ToString("g")</td>
+                            <td>
+                                <a href="/Mandi/Edit/@item.Id" class="btn btn-warning btn-sm fw-bold">Edit</a>
+                                <a href="/Mandi/Delete/@item.Id" class="btn btn-danger btn-sm fw-bold">Delete</a>
+                                <a href="/Mandi/PrintReceipt/@item.Id" target="_blank" class="btn btn-primary btn-sm fw-bold">
+                                    🖨️ PDF
+                                </a>
+
+                            </td>
+                        </tr>
+                    }
+
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/Account/Logout" class="btn btn-outline-danger btn-sm">सुरक्षित लॉगआउट करें</a>
+    </div>
+</div>

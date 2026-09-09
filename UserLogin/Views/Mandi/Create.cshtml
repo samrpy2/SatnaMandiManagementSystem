@@ -1,0 +1,35 @@
+﻿@model UserLogin.Models.MandiItem
+
+@{
+    ViewData["Title"] = "नया आइटम जोड़ें";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5 card p-4 shadow-sm">
+        <h3 class="text-center mb-4 text-success">🌾 सतना मंडी - नया स्टॉक एंट्री</h3>
+
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success text-center">@ViewBag.SuccessMessage</div>
+        }
+
+        <form method="post" action="/Mandi/Create">
+            <div class="mb-3">
+                <label class="form-label">फल या सब्जी का नाम</label>
+                <input type="text" name="ItemName" class="form-control" placeholder="जैसे: केला, आलू, टमाटर" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">मात्रा (क्विंटल में)</label>
+                <input type="number" step="0.01" name="QuantityInQuintal" class="form-control" placeholder="0.00" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">आज का भाव (₹ प्रति क्विंटल)</label>
+                <input type="number" step="0.01" name="TodayRatePerQuintal" class="form-control" placeholder="जैसे: 1500" required />
+            </div>
+            <button type="submit" class="btn btn-success w-100">डेटाबेस में सेव करें</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="/Home/Index" class="btn btn-link">← डैशबोर्ड पर वापस जाएं</a>
+        </div>
+    </div>
+</div>

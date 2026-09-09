@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "डैशबोर्ड - सतना मंडी";
+}
+
+<div class="container mt-4">
+    <!-- 👤 यूजर का स्वागत संदेश जो हमने पहले बनाया था -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <h2 class="text-dark">🌾 सतना मंडी मैनेजमेंट सिस्टम</h2>
+        <span class="badge bg-light text-dark p-2 fs-6 shadow-sm">👋 स्वागत है, @User.Identity?.Name!</span>
+    </div>
+
+    <!-- 📊 समरी कार्ड्स (Summary Boxes) का सेक्शन -->
+    <div class="row g-3 mb-5">
+        <!-- कार्ड 1: कुल वैरायटी -->
+        <div class="col-md-4">
+            <div class="card border-0 bg-primary text-white shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between p-4">
+                    <div>
+                        <h6 class="text-uppercase text-white-50 mb-2 fw-bold">कुल उत्पाद वैरायटी</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.TotalItemsCount प्रकार</h2>
+                    </div>
+                    <div class="mt-3 text-white-50 small">डेटाबेस में कुल रिकॉर्ड्स</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- कार्ड 2: कुल मात्रा -->
+        <div class="col-md-4">
+            <div class="card border-0 bg-success text-white shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between p-4">
+                    <div>
+                        <h6 class="text-uppercase text-white-50 mb-2 fw-bold">कुल उपलब्ध स्टॉक</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.TotalQuantity.ToString("N2") क्विंटल</h2>
+                    </div>
+                    <div class="mt-3 text-white-50 small">मंडी में मौजूद कुल वजन</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- कार्ड 3: कुल स्टॉक वैल्यू -->
+        <div class="col-md-4">
+            <div class="card border-0 bg-warning text-dark shadow-sm h-100">
+                <div class="card-body d-flex flex-column justify-content-between p-4">
+                    <div>
+                        <h6 class="text-uppercase text-dark-50 mb-2 fw-bold">कुल अनुमानित मूल्य</h6>
+                        <h2 class="mb-0 fw-bold">₹@ViewBag.TotalStockValue.ToString("N2")</h2>
+                    </div>
+                    <div class="mt-3 text-dark-50 small">आज के मंडी रेट के अनुसार</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔗 क्विक नेविगेशन लिंक्स -->
+    <div class="text-center p-4 bg-light rounded shadow-sm">
+        <h5 class="mb-3 text-muted">क्विक एक्शन्स (Quick Actions)</h5>
+        <a href="/Mandi/Index" class="btn btn-outline-success btn-lg me-3 fw-bold">📊 लाइव स्टॉक बोर्ड देखें</a>
+        <a href="/Mandi/Create" class="btn btn-success btn-lg fw-bold">+ नया स्टॉक एंट्री करें</a>
+    </div>
+</div>

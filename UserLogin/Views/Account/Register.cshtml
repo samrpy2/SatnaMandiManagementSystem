@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "रजिस्ट्रेशन पेज";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4 card p-4 shadow-sm">
+        <h3 class="text-center mb-4">नया अकाउंट बनाएं</h3>
+
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success text-center">@ViewBag.SuccessMessage</div>
+        }
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger text-center">@ViewBag.ErrorMessage</div>
+        }
+
+        <form method="post" action="/Account/Register">
+            <div class="mb-3">
+                <label class="form-label">Username (Email)</label>
+                <input type="email" name="username" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Passward</label>
+                <input type="password" name="password" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-success w-100">साइन अप करें</button>
+            <div class="text-center mt-3">
+                <a href="/Account/Login">पहले से अकाउंट है? लॉगिन करें</a>
+            </div>
+        </form>
+    </div>
+</div>

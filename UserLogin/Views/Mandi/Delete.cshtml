@@ -1,0 +1,31 @@
+﻿@model UserLogin.Models.MandiItem
+
+@{
+    ViewData["Title"] = "स्टॉक हटाने की पुष्टि";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5 card p-4 shadow-sm border-danger">
+        <h3 class="text-center text-danger mb-4">⚠️ स्टॉक हटाने की पुष्टि करें</h3>
+
+        <div class="alert alert-warning text-center">
+            क्या आप सच में सतना मंडी के स्टॉक से इस आइटम को हमेशा के लिए हटाना चाहते हैं?
+        </div>
+
+        <div class="mb-3 p-3 bg-light rounded">
+            <h5><strong>आइटम का नाम:</strong> @Model.ItemName</h5>
+            <p class="mb-1"><strong>मात्रा:</strong> @Model.QuantityInQuintal क्विंटल</p>
+            <p class="mb-0"><strong>आज का भाव:</strong> ₹@Model.TodayRatePerQuintal / क्विंटल</p>
+        </div>
+
+        <!-- 📌 यह फॉर्म POST मेथड के जरिए DeleteConfirmed को ट्रिगर करेगा -->
+        <form method="post" action="/Mandi/Delete">
+            <input type="hidden" name="Id" value="@Model.Id" />
+
+            <div class="d-flex justify-content-between">
+                <a href="/Mandi/Index" class="btn btn-secondary w-45">नहीं, वापस जाएं</a>
+                <button type="submit" class="btn btn-danger w-45">हाँ, डिलीट करें</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,111 @@
+﻿@model UserLogin.Models.MandiItem
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>रसीद - @Model.ItemName</title>
+    <link rel="stylesheet" href="https://jsdelivr.net">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 30px;
+            /* 📌 पूरे पेज के बैकग्राउंड में फल-सब्जियों की रंगीन इमेज लगाना */
+            background-image: url('https://unsplash.com');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            border: 1px solid #eee;
+            padding: 30px;
+            /* 📌 रसीद के डिब्बे को हल्का पारदर्शी (Semi-Transparent) बनाना ताकि पीछे का बैकग्राउंड दिखे */
+            background-color: rgba(255, 255, 255, 0.92) !important;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        /* 📌 यह कोड ब्राउज़र को बताता है कि प्रिंट करते समय बैकग्राउंड कलर्स और इमेजेस को न छुपाए */
+        @@media print {
+            body
+
+        {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            background-image: url('https://unsplash.com') !important;
+        }
+
+        .invoice-box {
+            background-color: rgba(255, 255, 255, 0.92) !important;
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <div class="invoice-box">
+        <div class="text-center mb-4">
+            <h2 class="text-success fw-bold">🍏 सतना फल एवं सब्जी मंडी</h2>
+            <p class="text-muted mb-0">आधिकारिक स्टॉक रसीद / इनवॉइस</p>
+            <hr>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-6">
+                <strong>रसीद संख्या:</strong> SATNA-MANDI-REC-@Model.Id<br>
+                <strong>दिनांक:</strong> @Model.LastUpdated.ToLocalTime().ToString("g")
+            </div>
+            <div class="col-6 text-end">
+                <strong>जारीकर्ता:</strong> @User.Identity?.Name<br>
+                <strong>स्थान:</strong> सतना, मध्य प्रदेश
+            </div>
+        </div>
+
+        <table class="table table-bordered text-center mt-3 bg-white">
+            <thead class="table-dark">
+                <tr>
+                    <th>आइटम का नाम</th>
+                    <th>मात्रा (क्विंटल)</th>
+                    <th>आज का भाव (₹/क्विंटल)</th>
+                    <th>कुल मूल्य (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold">@Model.ItemName</td>
+                    <td>@Model.QuantityInQuintal Qtl</td>
+                    <td>₹@Model.TodayRatePerQuintal</td>
+                    <td class="text-primary fw-bold">₹@(Model.QuantityInQuintal* Model.TodayRatePerQuintal)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="text-center mt-5 pt-4 border-top text-muted small">
+            यह एक कंप्यूटर जनरेटेड रसीद है। सतना मंडी प्राधिकरण द्वारा स्वीकृत।
+        </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            // इमेज लोड होने के लिए आधा सेकंड का समय देना ताकि पीडीएफ खाली न आए
+            setTimeout(function() {
+                window.print();
+            }, 500);
+
+            window.onafterprint = function() {
+                window.location.href = '/Mandi/Index';
+            }
+        }
+    </script>
+
+</body>
+</html>

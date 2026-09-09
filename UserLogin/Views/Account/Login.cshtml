@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Log In Page";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4 card p-4 shadow-sm">
+        <h3 class="text-center mb-4">Log In</h3>
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger text-center">@ViewBag.ErrorMessage</div>
+        }
+
+        <form method="post" action="/Account/Login">
+            <div class="mb-3">
+                <label class="form-label">UserName (Email)</label>
+                <input type="text" name="username" class="form-line form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Pasward</label>
+                <input type="password" name="password" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">LogIn</button>
+            <div class="text-center mt-3">
+                <a href="/Account/Register">नया अकाउंट बनाएं</a>
+            </div>
+        </form>
+    </div>
+</div>
