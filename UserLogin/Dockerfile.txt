@@ -8,3 +8,4 @@ FROM ://microsoft.com AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "UserLogin.dll"]
+
