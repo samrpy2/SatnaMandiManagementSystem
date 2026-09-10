@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using UserLogin.Data;
 using UserLogin.Models;
 
@@ -40,28 +41,41 @@ namespace UserLogin.Controllers
             ViewBag.ErrorMessage = "कृपया सभी डेटा सही-सही भरें!";
             return View(item);
         }
-        // 3. सारा मंडी स्टॉक स्क्रीन पर दिखाने के लिए (Read/Index)
-        // 📌 लाइव स्टॉक बोर्ड - सर्च बार के साथ (Read/Index)
         [HttpGet]
-        public IActionResult Index(string searchString)
+        public IActionResult Index(string searchString, string categoryFilter, int? pageNumber)
         {
-            // 1. डेटाबेस से सारे आइटम्स की क्वेरी तैयार करें (अभी रन नहीं होगी)
+            // 1. Maintain existing filters in ViewData
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["SelectedCategory"] = categoryFilter;
+
+            // 2. Fetch basic query
             var itemsQuery = from m in _context.MandiItems
                              select m;
 
-            // 2. यदि यूजर ने सर्च बॉक्स में कुछ टाइप किया है (Null या खाली नहीं है)
+            // 3. Apply search query filter
             if (!string.IsNullOrEmpty(searchString))
             {
-                // LINQ का उपयोग करके नाम मैच करें (PostgreSQL में Contains केस-सेंसिटिव हो सकता है, इसलिए Lower कर सकते हैं)
                 itemsQuery = itemsQuery.Where(s => s.ItemName.ToLower().Contains(searchString.ToLower()));
             }
 
-            // 3. सर्च की हुई स्ट्रिंग को वापस व्यू पर भेजें ताकि सर्च बॉक्स में वो नाम लिखा रहे
-            ViewData["CurrentFilter"] = searchString;
+            // 4. Apply category selection filter
+            if (!string.IsNullOrEmpty(categoryFilter))
+            {
+                itemsQuery = itemsQuery.Where(x => x.Category == categoryFilter);
+            }
 
-            // 4. अंत में डेटाबेस से लिस्ट बनाकर व्यू (HTML) की तरफ भेजें
-            return View(itemsQuery.ToList());
+            // Order items so the newest or recently updated stock stays on top
+            itemsQuery = itemsQuery.OrderByDescending(x => x.LastUpdated);
+
+            // 5. Define page configuration (10 items per page)
+            int pageSize = 10;
+            int currentPage = pageNumber ?? 1;
+
+            // 6. Return the paginated data structure instead of a raw list
+            return View(PaginatedList<MandiItem>.Create(itemsQuery, currentPage, pageSize));
         }
+
+
 
         [HttpGet]
         public IActionResult Edit(int id)
@@ -78,26 +92,29 @@ namespace UserLogin.Controllers
             return View(item);
         }
 
-        // 2. फॉर्म सबमिट होने पर नया डेटा डेटाबेस में सुरक्षित करना (POST)
         [HttpPost]
         public IActionResult Edit(MandiItem updatedItem)
         {
             if (ModelState.IsValid)
             {
-                updatedItem.LastUpdated = DateTime.UtcNow; // नया टाइमस्टैम्प सेट करें
+                // 1. डेटाबेस से उस आइटम का पुराना रिकॉर्ड निकालें
+                var existingItem = _context.MandiItems.AsNoTracking().FirstOrDefault(x => x.Id == updatedItem.Id);
 
-                // EF Core को बताओ कि इस आइटम का डेटा बदल चुका है
+                if (existingItem != null)
+                {
+                    // 2. पुराने आज के भाव को 'कल का भाव' बना दें
+                    updatedItem.YesterdayRatePerQuintal = existingItem.TodayRatePerQuintal;
+                }
+
+                updatedItem.LastUpdated = DateTime.UtcNow;
                 _context.MandiItems.Update(updatedItem);
-
-                // 📌 यह जादुई लाइन आपके PostgreSQL में डेटा अपडेट कर देगी!
                 _context.SaveChanges();
 
-                // काम पूरा होने के बाद वापस लाइव स्टॉक बोर्ड (Index) पर चले जाओ
                 return RedirectToAction("Index");
             }
-
-            return View(updatedItem); // अगर डेटा सही नहीं भरा तो वापस उसी पेज पर एरर के साथ रहो
+            return View(updatedItem);
         }
+
 
         // 1. डिलीट करने से पहले यूजर को कन्फर्मेशन पेज दिखाना (GET)
         [HttpGet]

@@ -12,43 +12,78 @@
     <!-- 📊 समरी कार्ड्स (Summary Boxes) का सेक्शन -->
     <div class="row g-3 mb-5">
         <!-- कार्ड 1: कुल वैरायटी -->
+        <!-- कार्ड 1: कुल वैरायटी (फल और सब्जी अलग-अलग के साथ) -->
         <div class="col-md-4">
             <div class="card border-0 bg-primary text-white shadow-sm h-100">
                 <div class="card-body d-flex flex-column justify-content-between p-4">
                     <div>
                         <h6 class="text-uppercase text-white-50 mb-2 fw-bold">कुल उत्पाद वैरायटी</h6>
-                        <h2 class="mb-0 fw-bold">@ViewBag.TotalItemsCount प्रकार</h2>
+                        <h2 class="mb-3 fw-bold">@ViewBag.TotalItemsCount प्रकार</h2>
+
+                        <!-- 📌 फल और सब्जी को अलग-अलग दिखाने के लिए नए सुंदर बैज -->
+                        <div class="d-flex flex-column gap-1">
+                            <span class="badge bg-light text-dark text-start fw-bold px-2 py-2">
+                                🥬 सब्जियां: @ViewBag.VegetableCount
+                            </span>
+                            <span class="badge bg-light text-dark text-start fw-bold px-2 py-2">
+                                🍎 फल: @ViewBag.FruitCount
+                            </span>
+                        </div>
                     </div>
-                    <div class="mt-3 text-white-50 small">डेटाबेस में कुल रिकॉर्ड्स</div>
+                    <div class="mt-3 text-white-50 small">डेटाबेस में कुल लाइव रिकॉर्ड्स</div>
                 </div>
             </div>
         </div>
 
+
         <!-- कार्ड 2: कुल मात्रा -->
+        <!-- कार्ड 2: कुल उपलब्ध स्टॉक (सब्जी और फल का वजन अलग-अलग के साथ) -->
         <div class="col-md-4">
             <div class="card border-0 bg-success text-white shadow-sm h-100">
                 <div class="card-body d-flex flex-column justify-content-between p-4">
                     <div>
                         <h6 class="text-uppercase text-white-50 mb-2 fw-bold">कुल उपलब्ध स्टॉक</h6>
-                        <h2 class="mb-0 fw-bold">@ViewBag.TotalQuantity.ToString("N2") क्विंटल</h2>
+                        <h2 class="mb-3 fw-bold">@ViewBag.TotalQuantity.ToString("N2") Qtl</h2>
+
+                        <!-- 📌 सब्जी और फल का वजन क्विंटल में अलग-अलग दिखाने के लिए नए सुंदर बैज -->
+                        <div class="d-flex flex-column gap-1">
+                            <span class="badge bg-light text-dark text-start fw-bold px-2 py-2">
+                                🥬 सब्जियां: @ViewBag.VegQuantity.ToString("N2") Qtl
+                            </span>
+                            <span class="badge bg-light text-dark text-start fw-bold px-2 py-2">
+                                🍎 फल: @ViewBag.FruitQuantity.ToString("N2") Qtl
+                            </span>
+                        </div>
                     </div>
-                    <div class="mt-3 text-white-50 small">मंडी में मौजूद कुल वजन</div>
+                    <div class="mt-3 text-white-50 small">मंडी में मौजूद कुल लाइव वजन</div>
                 </div>
             </div>
         </div>
 
-        <!-- कार्ड 3: कुल स्टॉक वैल्यू -->
+
+        <!-- कार्ड 3: कुल अनुमानित मूल्य (सब्जी और फल का मूल्य अलग-अलग के साथ) -->
         <div class="col-md-4">
             <div class="card border-0 bg-warning text-dark shadow-sm h-100">
                 <div class="card-body d-flex flex-column justify-content-between p-4">
                     <div>
                         <h6 class="text-uppercase text-dark-50 mb-2 fw-bold">कुल अनुमानित मूल्य</h6>
-                        <h2 class="mb-0 fw-bold">₹@ViewBag.TotalStockValue.ToString("N2")</h2>
+                        <h2 class="mb-3 fw-bold">₹@ViewBag.TotalStockValue.ToString("N2")</h2>
+
+                        <!-- 📌 सब्जी और फल का मूल्य अलग-अलग दिखाने के लिए नए सुंदर बैज -->
+                        <div class="d-flex flex-column gap-1">
+                            <span class="badge bg-light text-dark text-start fw-bold px-2 py-2">
+                                🥬 सब्जियां: ₹@ViewBag.VegStockValue.ToString("N2")
+                            </span>
+                            <span class="badge bg-light text-dark text-start fw-bold px-2 py-2">
+                                🍎 फल: ₹@ViewBag.FruitStockValue.ToString("N2")
+                            </span>
+                        </div>
                     </div>
                     <div class="mt-3 text-dark-50 small">आज के मंडी रेट के अनुसार</div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- 🔗 क्विक नेविगेशन लिंक्स -->

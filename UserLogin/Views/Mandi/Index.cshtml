@@ -1,8 +1,22 @@
-﻿@model IEnumerable<UserLogin.Models.MandiItem>
+﻿
+@model UserLogin.Models.PaginatedList<UserLogin.Models.MandiItem>
+
 
 @{
     ViewData["Title"] = "सतना मंडी लाइव स्टॉक";
 }
+<style>
+    /* 📌 कम स्टॉक वाले अलर्ट को चमकाने (Blink) के लिए एनीमेशन */
+    .animate-pulse {
+        animation: pulse 1.5s infinite;
+    }
+    @@keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+</style>
+
 
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -10,24 +24,33 @@
         <a href="/Mandi/Create" class="btn btn-success">+ नया स्टॉक जोड़ें</a>
     </div>
 
-    <!-- 🔍 लाइव सर्च और फ़िल्टर फॉर्म -->
+    <!-- 🔍 लाइव सर्च और कैटेगरी फ़िल्टर फॉर्म -->
     <form method="get" action="/Mandi/Index" class="mb-4">
         <div class="row g-2 justify-content-end">
-            <div class="col-md-4 col-8">
-                <!-- value में पुराना सर्च किया हुआ नाम बना रहेगा -->
-                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="सब्जी या फल का नाम टाइप करें..." />
+            <!-- 1. नाम से खोजने के लिए सर्च बॉक्स -->
+            <div class="col-md-4 col-6">
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="सब्जी या फल का नाम..." />
             </div>
-            <div class="col-md-2 col-4">
+
+            <!-- 2. कैटेगरी से छांटने के लिए नया ड्रॉपडाउन -->
+            <div class="col-md-3 col-6">
+                <select name="categoryFilter" class="form-select">
+                    <option value="">📋 सभी कैटेगरी (All)</option>
+                    <option value="Vegetable" selected="@(ViewData["SelectedCategory"]?.ToString() == "Vegetable")">🥬 सिर्फ सब्जी</option>
+                    <option value="Fruit" selected="@(ViewData["SelectedCategory"]?.ToString() == "Fruit")">🍎 सिर्फ फल</option>
+                </select>
+            </div>
+
+            <!-- 3. एक्शन बटन्स -->
+            <div class="col-md-2 col-8">
                 <button type="submit" class="btn btn-dark w-100 fw-bold">🔍 खोजें</button>
             </div>
-            @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
-            {
-                <div class="col-md-1 col-12 text-center">
-                    <a href="/Mandi/Index" class="btn btn-outline-secondary w-100">साफ़ करें</a>
-                </div>
-            }
+            <div class="col-md-1 col-4">
+                <a href="/Mandi/Index" class="btn btn-outline-secondary w-100">साफ़</a>
+            </div>
         </div>
     </form>
+
 
     <div class="card shadow-sm p-4">
         <table class="table table-bordered table-striped text-center align-middle">
@@ -56,10 +79,52 @@
                         <tr>
                             <td>@item.Id</td>
                             <td class="fw-bold text-dark">@item.ItemName</td>
-                            <td>@item.QuantityInQuintal Qtl</td>
-                            <td class="text-success fw-bold">₹@item.TodayRatePerQuintal</td>
+                            <td>
+                                <!-- 📌 अगर स्टॉक 5 क्विंटल या उससे कम है तो लाल रंग का अलर्ट दिखाओ -->
+                                @if (item.QuantityInQuintal <= 2)
+                                {
+                                    <span class="badge bg-danger text-white p-2 shadow-sm animate-pulse">
+                                        ⚠️ @item.QuantityInQuintal Qtl 
+                                    </span>
+                                }
+                                else
+                                {
+                                    <!-- 📌 अगर स्टॉक 5 क्विंटल से ज़्यादा है तो सामान्य रूप से दिखाओ -->
+                                    <span class="text-dark fw-bold">
+                                        @item.QuantityInQuintal Qtl
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <span class="fw-bold">₹@item.TodayRatePerQuintal</span>
+
+                                @if (item.YesterdayRatePerQuintal > 0)
+                                {
+                                    @if (item.TodayRatePerQuintal > item.YesterdayRatePerQuintal)
+                                    {
+                                        <!-- ⬆️ अगर दाम बढ़ा है तो हरा तीर और बढ़ा हुआ मूल्य दिखाएं -->
+                                        <small class="text-success ms-2 fw-bold">
+                                            ⬆️ ₹@(item.TodayRatePerQuintal - item.YesterdayRatePerQuintal)
+                                        </small>
+                                    }
+                                    else if (item.TodayRatePerQuintal < item.YesterdayRatePerQuintal)
+                                    {
+                                        <!-- ⬇️ अगर दाम घटा है तो लाल तीर और घटा हुआ मूल्य दिखाएं -->
+                                        <small class="text-danger ms-2 fw-bold">
+                                            ⬇️ ₹@(item.YesterdayRatePerQuintal - item.TodayRatePerQuintal)
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <!-- ➡️ अगर दाम स्थिर है -->
+                                        <small class="text-muted ms-2">➡️ स्थिर</small>
+                                    }
+                                }
+                            </td>
+
                             <td class="text-primary fw-bold">
-                                🌐 ₹@(item.QuantityInQuintal* item.TodayRatePerQuintal)
+                                ₹@(item.QuantityInQuintal* item.TodayRatePerQuintal)
                             </td>
                             <td class="text-muted small">@item.LastUpdated.ToLocalTime().ToString("g")</td>
                             <td>
@@ -76,6 +141,29 @@
                 }
             </tbody>
         </table>
+        <!-- 🖲️ NATIVE BOOTSTRAP PAGINATION CONTROLS -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <!-- Page Information Label -->
+            <div class="text-muted fw-semibold">
+                Page @Model.PageIndex of @Model.TotalPages (Total Pages)
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div>
+                <!-- Previous Page Button -->
+                <a href="/Mandi/Index?pageNumber=@(Model.PageIndex - 1)&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewData["SelectedCategory"]"
+                   class="btn btn-outline-dark fw-bold me-2 @(Model.HasPreviousPage ? "" : "disabled")">
+                    ← Previous
+                </a>
+
+                <!-- Next Page Button -->
+                <a href="/Mandi/Index?pageNumber=@(Model.PageIndex + 1)&searchString=@ViewData["CurrentFilter"]&categoryFilter=@ViewData["SelectedCategory"]"
+                   class="btn btn-outline-dark fw-bold @(Model.HasNextPage ? "" : "disabled")">
+                    Next →
+                </a>
+            </div>
+        </div>
+
     </div>
 
     <div class="text-center mt-4">

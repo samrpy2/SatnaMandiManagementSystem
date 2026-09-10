@@ -17,25 +17,46 @@ namespace UserLogin.Controllers
 
         public IActionResult Index()
         {
-            // 1. मंडी में कुल कितने प्रकार के आइटम्स हैं
+            // 1. वैरायटी काउंट (सब्जी और फल अलग-अलग)
             int totalItemsCount = _context.MandiItems.Count();
+            int vegetableCount = _context.MandiItems.Count(x => x.Category == "Vegetable");
+            int fruitCount = _context.MandiItems.Count(x => x.Category == "Fruit");
 
-            // 2. कुल कितने क्विंटल स्टॉक मौजूद है (LINQ Sum)
-            double totalQuantity = _context.MandiItems.Any()
-                ? _context.MandiItems.Sum(x => x.QuantityInQuintal)
-                : 0;
+            // 2. उपलब्ध स्टॉक वजन (सब्जी और फल अलग-अलग)
+            double totalQuantity = _context.MandiItems.Any() ? _context.MandiItems.Sum(x => x.QuantityInQuintal) : 0;
+            double vegQuantity = _context.MandiItems.Any(x => x.Category == "Vegetable") ? _context.MandiItems.Where(x => x.Category == "Vegetable").Sum(x => x.QuantityInQuintal) : 0;
+            double fruitQuantity = _context.MandiItems.Any(x => x.Category == "Fruit") ? _context.MandiItems.Where(x => x.Category == "Fruit").Sum(x => x.QuantityInQuintal) : 0;
 
-            // 3. पूरे स्टॉक की कुल अनुमानित कीमत कितनी है (मात्रा * भाव का कुल जोड़)
+            // 3. कुल उपलब्ध स्टॉक का कुल मूल्य
             double totalStockValue = _context.MandiItems.Any()
                 ? _context.MandiItems.Sum(x => x.QuantityInQuintal * x.TodayRatePerQuintal)
                 : 0;
 
-            // 4. इन तीनों वैल्यूज को View पर भेजने के लिए ViewBag का उपयोग करेंगे
+            // 📌 4. नया अपडेट: केवल सब्जियों का कुल अनुमानित मूल्य (मात्रा * भाव)
+            double vegStockValue = _context.MandiItems.Any(x => x.Category == "Vegetable")
+                ? _context.MandiItems.Where(x => x.Category == "Vegetable").Sum(x => x.QuantityInQuintal * x.TodayRatePerQuintal)
+                : 0;
+
+            // 📌 5. नया अपडेट: केवल फलों का कुल अनुमानित मूल्य (मात्रा * भाव)
+            double fruitStockValue = _context.MandiItems.Any(x => x.Category == "Fruit")
+                ? _context.MandiItems.Where(x => x.Category == "Fruit").Sum(x => x.QuantityInQuintal * x.TodayRatePerQuintal)
+                : 0;
+
+            // सभी वैल्यूज को ViewBag के ज़रिए व्यू पर भेजना
             ViewBag.TotalItemsCount = totalItemsCount;
+            ViewBag.VegetableCount = vegetableCount;
+            ViewBag.FruitCount = fruitCount;
             ViewBag.TotalQuantity = totalQuantity;
+            ViewBag.VegQuantity = vegQuantity;
+            ViewBag.FruitQuantity = fruitQuantity;
             ViewBag.TotalStockValue = totalStockValue;
+            ViewBag.VegStockValue = vegStockValue;
+            ViewBag.FruitStockValue = fruitStockValue;
 
             return View();
         }
+
+
+
     }
 }
