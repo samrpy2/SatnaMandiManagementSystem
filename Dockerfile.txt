@@ -1,20 +1,14 @@
-FROM ://microsoft.com AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+﻿FROM ://microsoft.com AS build-env
+WORKDIR /App
 
-FROM ://microsoft.com AS build
-WORKDIR /src
-COPY ["UserLogin.csproj", "."]
-RUN dotnet restore "./UserLogin.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "UserLogin.csproj" -c Release -o /app/build
+# सभी फाइलें कॉपी करें और प्रोजेक्ट को पब्लिश करें
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-FROM build AS publish
-RUN dotnet publish "UserLogin.csproj" -c Release -o /app/publish /p:UseAppHost=false
+# रनटाइम इमेज बनाएं
+FROM ://microsoft.com
+WORKDIR /App
+COPY --from=build-env /App/out .
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# 📌 यहाँ बस अपने प्रोजेक्ट का असली नाम लिख दें
 ENTRYPOINT ["dotnet", "UserLogin.dll"]
