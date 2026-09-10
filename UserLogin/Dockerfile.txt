@@ -1,0 +1,10 @@
+﻿FROM ://microsoft.com AS build
+WORKDIR /src
+COPY . .
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
+
+FROM ://microsoft.com AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "UserLogin.dll"]
