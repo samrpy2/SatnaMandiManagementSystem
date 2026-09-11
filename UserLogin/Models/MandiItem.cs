@@ -14,6 +14,8 @@ namespace UserLogin.Models
         public string Category { get; set; } = "Vegetable"; // Default value
                                                             // 📌 कल का भाव (दाम में उतार-चढ़ाव देखने के लिए)
         public double YesterdayRatePerQuintal { get; set; } = 0;
+        // 📌 सॉफ्ट डिलीट के लिए: अगर true है तो माल डिलीट माना जाएगा, पर DB में रहेगा
+        public bool IsDeleted { get; set; } = false;
 
     }
 }

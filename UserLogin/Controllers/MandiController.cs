@@ -49,14 +49,19 @@ namespace UserLogin.Controllers
             ViewData["SelectedCategory"] = categoryFilter;
 
             // 2. Fetch basic query
+            
+            // 📌 केवल वही आइटम लाएं जो डिलीट नहीं हुए हैं (IsDeleted == false)
             var itemsQuery = from m in _context.MandiItems
+                             where m.IsDeleted == false
                              select m;
+
 
             // 3. Apply search query filter
             if (!string.IsNullOrEmpty(searchString))
             {
                 itemsQuery = itemsQuery.Where(s => s.ItemName.ToLower().Contains(searchString.ToLower()));
             }
+
 
             // 4. Apply category selection filter
             if (!string.IsNullOrEmpty(categoryFilter))
@@ -129,17 +134,28 @@ namespace UserLogin.Controllers
         }
 
         // 2. जब यूजर 'Delete.cshtml' पेज पर जाकर "हाँ, डिलीट करें" बटन दबाएगा (POST)
+        // 📌 सॉफ्ट डिलीट कन्फर्मेशन (Post)
         [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(int id)
+        [ValidateAntiForgeryToken] // यह सुरक्षा टोकन की जांच करता है
+        public IActionResult DeleteConfirmed(int id) // 👈 ध्यान दें: यहाँ 'id' ही लिखा होना चाहिए
         {
+            // डेटाबेस से आइटम ढूंढें
             var item = _context.MandiItems.FirstOrDefault(x => x.Id == id);
+
             if (item != null)
             {
-                _context.MandiItems.Remove(item);
-                _context.SaveChanges(); // डेटाबेस से हमेशा के लिए डिलीट
+                // डेटाबेस से हमेशा के लिए डिलीट करने के बजाय सिर्फ IsDeleted को true करें
+                item.IsDeleted = true;
+                item.LastUpdated = DateTime.UtcNow;
+
+                _context.MandiItems.Update(item);
+                _context.SaveChanges();
             }
-            return RedirectToAction("Index"); // वापस लाइव स्टॉक बोर्ड पर भेजें
+
+            return RedirectToAction("Index");
         }
+
+
         // 📌 रसीद का पेज दिखाने के लिए (GET)
         [HttpGet]
         public IActionResult PrintReceipt(int id)

@@ -84,6 +84,52 @@
             </div>
         </div>
 
+        <!-- 📊 नया एडवांस कार्ड: लाइव मंडी मुनाफ़ा / नुकसान विश्लेषण -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                @if (ViewBag.TotalProfitOrLoss > 0)
+                {
+                    <!-- यदि व्यापार मुनाफ़े में है तो हरा चमकदार अलर्ट बोर्ड दिखाओ -->
+                    <div class="card border-0 bg-success text-white shadow-sm p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-white-50 mb-1 fw-bold">बाजार के रुख से कुल अनुमानित मुनाफ़ा (Profit Trend)</h6>
+                                <h2 class="fw-bold mb-0">🎉 + ₹@ViewBag.TotalProfitOrLoss.ToString("N2")</h2>
+                            </div>
+                            <div class="fs-1">📈</div>
+                        </div>
+                    </div>
+                }
+                else if (ViewBag.TotalProfitOrLoss < 0)
+                {
+                    <!-- यदि व्यापार घाटे की ओर है तो लाल अलर्ट बोर्ड दिखाओ ताकि व्यापारी सतर्क हो जाए -->
+                    <div class="card border-0 bg-danger text-white shadow-sm p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-white-50 mb-1 fw-bold">बाजार के रुख से कुल अनुमानित नुकसान (Loss Trend)</h6>
+                                <h2 class="fw-bold mb-0">⚠️ - ₹@Math.Abs(ViewBag.TotalProfitOrLoss).ToString("N2")</h2>
+                            </div>
+                            <div class="fs-1">📉</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- यदि दाम स्थिर हैं तो न्यूट्रल बोर्ड दिखाओ -->
+                    <div class="card border-0 bg-secondary text-white shadow-sm p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-white-50 mb-1 fw-bold">बाजार का लाइव विश्लेषण (Market Trend)</h6>
+                                <h2 class="fw-bold mb-0">➡️ बाजार आज पूरी तरह स्थिर है</h2>
+                            </div>
+                            <div class="fs-1">⚖️</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+
     </div>
 
     <!-- 🔗 क्विक नेविगेशन लिंक्स -->

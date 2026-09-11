@@ -9,7 +9,7 @@
         <h3 class="text-center text-danger mb-4">⚠️ स्टॉक हटाने की पुष्टि करें</h3>
 
         <div class="alert alert-warning text-center">
-            क्या आप सच में सतना मंडी के स्टॉक से इस आइटम को हमेशा के लिए हटाना चाहते हैं?
+            क्या आप सच में सतना मंडी के स्टॉक से इस आइटम को हटाना चाहते हैं?
         </div>
 
         <div class="mb-3 p-3 bg-light rounded">
@@ -18,9 +18,13 @@
             <p class="mb-0"><strong>आज का भाव:</strong> ₹@Model.TodayRatePerQuintal / क्विंटल</p>
         </div>
 
-        <!-- 📌 यह फॉर्म POST मेथड के जरिए DeleteConfirmed को ट्रिगर करेगा -->
-        <form method="post" action="/Mandi/Delete">
-            <input type="hidden" name="Id" value="@Model.Id" />
+        <!-- 📌 400 Bad Request एरर को खत्म करने के लिए asp-action और Antiforgery Token का उपयोग -->
+        <form asp-action="Delete" method="post">
+            <!-- 1. यह गुप्त इनपुट सुरक्षित रूप से कंट्रोलर तक सही ID पहुंचाएगा -->
+            <input type="hidden" asp-for="Id" />
+
+            <!-- 2. यह सुरक्षा टोकन .NET Core कम्पाइलर को आश्वस्त करेगा और ऐप क्रैश होने से बचाएगा -->
+            @Html.AntiForgeryToken()
 
             <div class="d-flex justify-content-between">
                 <a href="/Mandi/Index" class="btn btn-secondary w-45">नहीं, वापस जाएं</a>
