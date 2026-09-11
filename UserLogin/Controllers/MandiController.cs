@@ -32,7 +32,16 @@ namespace UserLogin.Controllers
             {
                 item.LastUpdated = DateTime.UtcNow; // करंट टाइम सेट करें
 
-                _context.MandiItems.Add(item); // 📌 EF Core में ऐड करें
+                _context.MandiItems.Add(item);
+                // ⏱️ ऑडिट लॉग रिकॉर्ड करें
+                var log = new AuditLog
+                {
+                    UserEmail = User.Identity?.Name ?? "Unknown",
+                    Action = "CREATE",
+                    Details = $"नया स्टॉक जोड़ा गया: {item.ItemName} ({item.QuantityInQuintal} Qtl, ₹{item.TodayRatePerQuintal}/Qtl)"
+                };
+                _context.AuditLogs.Add(log);
+                // 📌 EF Core में ऐड करें
                 _context.SaveChanges();        // 📌 PostgreSQL में सेव करें
 
                 ViewBag.SuccessMessage = $"{item.ItemName} मंडी स्टॉक में सफलतापूर्वक जोड़ दिया गया है!";
@@ -114,6 +123,15 @@ namespace UserLogin.Controllers
 
                 updatedItem.LastUpdated = DateTime.UtcNow;
                 _context.MandiItems.Update(updatedItem);
+                // ⏱️ ऑडिट लॉग रिकॉर्ड करें
+                var log = new AuditLog
+                {
+                    UserEmail = User.Identity?.Name ?? "Unknown",
+                    Action = "EDIT",
+                    Details = $"स्टॉक अपडेट किया गया: {updatedItem.ItemName} (नया रेट: ₹{updatedItem.TodayRatePerQuintal}, नया स्टॉक: {updatedItem.QuantityInQuintal} Qtl)"
+                };
+                _context.AuditLogs.Add(log);
+
                 _context.SaveChanges();
 
                 return RedirectToAction("Index");
@@ -150,6 +168,15 @@ namespace UserLogin.Controllers
                 item.LastUpdated = DateTime.UtcNow;
 
                 _context.MandiItems.Update(item);
+                // ⏱️ ऑडिट लॉग रिकॉर्ड करें
+                var log = new AuditLog
+                {
+                    UserEmail = User.Identity?.Name ?? "Unknown",
+                    Action = "SOFT-DELETE",
+                    Details = $"स्टॉक हटाया (Soft Delete) गया: {item.ItemName}"
+                };
+                _context.AuditLogs.Add(log);
+
                 _context.SaveChanges();
             }
 

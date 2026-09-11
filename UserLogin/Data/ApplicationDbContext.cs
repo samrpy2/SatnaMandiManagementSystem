@@ -9,6 +9,8 @@ namespace UserLogin.Data
         }
         public DbSet<UserLogin.Models.User> Users { get; set; } = null!;
         public DbSet<UserLogin.Models.MandiItem> MandiItems { get; set; } = null!;
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
 
     }
 }

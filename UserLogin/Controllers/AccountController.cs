@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using UserLogin.Data;
-using System.Linq;
-using System.Security.Claims;
+﻿using BCrypt.Net;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Security.Claims;
+using UserLogin.Data;
+using UserLogin.Models;
 
 
 namespace UserLogin.Controllers
@@ -92,6 +95,53 @@ namespace UserLogin.Controllers
             return RedirectToAction("Login");
         }
 
+
+
+        // 📌 1. पासवर्ड बदलने का पेज दिखाने के लिए (GET)
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        // 📌 2. पासवर्ड बदलने का लॉजिक प्रोसेस करने के लिए (POST)
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                // गिटहब/कुकी सेशन से वर्तमान लॉगिन यूजर का नाम (Email/Username) निकालें
+                var username = User.Identity?.Name;
+
+                // डेटाबेस से उस यूजर का असली रिकॉर्ड ढूंढें
+                var user = _context.Users.FirstOrDefault(u => u.Username == username || u.Username == username);
+
+                if (user != null)
+                {
+                    // 🔒 BCrypt की मदद से चेक करें कि फॉर्म में डाला गया पुराना पासवर्ड सही है या नहीं
+                    if (BCrypt.Net.BCrypt.Verify(model.OldPassword, user.Password))
+                    {
+                        // पुराने पासवर्ड को नए हैश पासवर्ड से बदलें
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+
+                        _context.Users.Update(user);
+                        _context.SaveChanges();
+
+                        // सफलता का मैसेज फ्रंटएंड पर भेजने के लिए TempData का उपयोग
+                        TempData["SuccessMessage"] = "🎉 पासवर्ड सफलतापूर्वक बदल गया है!";
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("OldPassword", "पुराना पासवर्ड गलत है!");
+                    }
+                }
+            }
+            return View(model);
+        }
 
     }
 }
