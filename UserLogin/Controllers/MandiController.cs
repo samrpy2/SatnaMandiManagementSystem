@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserLogin.Data;
 using UserLogin.Models;
+using System.Text;
 
 namespace UserLogin.Controllers
 {
@@ -49,7 +50,7 @@ namespace UserLogin.Controllers
             ViewData["SelectedCategory"] = categoryFilter;
 
             // 2. Fetch basic query
-            
+
             // 📌 केवल वही आइटम लाएं जो डिलीट नहीं हुए हैं (IsDeleted == false)
             var itemsQuery = from m in _context.MandiItems
                              where m.IsDeleted == false
@@ -171,6 +172,25 @@ namespace UserLogin.Controllers
             return View(item);
         }
 
+        // 📌 लाइव स्टॉक डेटा को एक्सेल/CSV में डाउनलोड करने का इंजन
+        [HttpGet]
+        public IActionResult ExportToCSV()
+        {
+            // 1. केवल वही माल उठाएं जो सॉफ्ट डिलीट नहीं हुआ है
+            var data = _context.MandiItems.Where(x => x.IsDeleted == false).ToList();
 
+            // 2. CSV फ़ाइल का हेडर (कॉलम के नाम) तैयार करें
+            var csvBuilder = new StringBuilder();
+            csvBuilder.AppendLine("Sr No,Item Name,Category,Quantity (Qtl),Today Rate (Rs),Last Updated");
+
+            // 3. लूप चलाकर सारा डेटा पंक्तियों (Rows) में भरें
+            foreach (var item in data)
+            {
+                csvBuilder.AppendLine($"{item.Id},{item.ItemName},{item.Category},{item.QuantityInQuintal},{item.TodayRatePerQuintal},{item.LastUpdated}");
+            }
+            // 4. डेटा को बाइट एरे में बदलकर एक्सेल फ़ाइल के रूप में डाउनलोड कराएं
+            var buffer = Encoding.UTF8.GetBytes(csvBuilder.ToString());
+            return File(buffer, "text/csv", $"Satna_Mandi_Stock_{DateTime.Now:yyyyMMdd}.csv");
+        }
     }
 }
